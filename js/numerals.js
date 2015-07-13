@@ -19,16 +19,25 @@
       var allHTMLElements = [].slice
         .call(document.querySelectorAll('[data-intl-numerals]'));
       allHTMLElements.forEach(function(el) {
-        var matches = el.textContent.match(b ? /\d+/g : /([٠-٩])/g);
+        var matches;
+        if (el.tagName === 'INPUT') {
+          matches = el.value.match(b ? /\d+/g : /([٠-٩])/g);;
+        } else {
+          matches = el.textContent.match(b ? /\d+/g : /([٠-٩])/g);
+        }
         if (matches != null) {
-          var text = el.textContent;
+          var text = (el.tagName === 'INPUT') ? el.value : el.textContent;
           var res = text;
           for (var i = 0; i < matches.length; i++) {
             res = res.replace(matches[i],
               b ? new Intl.NumberFormat('ar-EG').format(matches[i]) :
               matches[i].charCodeAt(0) - 1632);
           }
-          el.textContent = res;
+          if (el.tagName === 'INPUT') {
+            el.value = res;
+          } else {
+            el.textContent = res;
+          }
         }
       });
     },
