@@ -1,9 +1,23 @@
-"use strict";
+'use strict';
 
 (function(exports) {
-  var numerals = {
+  var NumeralsHelper = {
+    _cnvMutations: function() {
+      this._applyEAWA();
+    },
+
+    _applyEAWA: function() {
+      var lang = document.documentElement.lang;
+      if (lang === 'ar') {
+        this.toEA();
+      } else {
+        this.toWA();
+      }
+    },
+
     _cnvEAWA: function(b) {
-      var allHTMLElements = [].slice.call(document.querySelectorAll('[data-l10n-numerals]'));
+      var allHTMLElements = [].slice
+        .call(document.querySelectorAll('[data-intl-numerals]'));
       allHTMLElements.forEach(function(el) {
         var matches = el.textContent.match(b ? /\d+/g : /([٠-٩])/g);
         if (matches != null) {
@@ -44,14 +58,21 @@
        */
       var self = this;
       window.addEventListener('localized', function(evt) {
-        if (evt.detail.language === 'ar') {
-          self.toEA();
-        } else {
-          self.toWA();
-        }
+        self._applyEAWA();
       });
-    }
-  }
 
-  exports.numerals = numerals;
+      var observer = new MutationObserver(this._cnvMutations.bind(this));
+      this.observe = () => observer.observe(document.body, {
+        attributes: true,
+        characterData: false,
+        childList: true,
+        subtree: true,
+        attributeFilter: ['data-intl-numerals']
+      });
+      this.disconnect = () => observer.disconnect();
+      this.observe();
+    }
+  };
+
+  exports.NumeralsHelper = NumeralsHelper;
 }(window));
