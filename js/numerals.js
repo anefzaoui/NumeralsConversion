@@ -2,35 +2,37 @@
 
 (function(exports) {
   var numerals = {
-    // to Eastern Arabic numerals
-    toEA: function() {
+    _cnvEAWA: function(b) {
       var allHTMLElements = [].slice.call(document.querySelectorAll('[data-l10n-numerals]'));
       allHTMLElements.forEach(function(el) {
-        var matches = el.textContent.match(/\d+/g);
+        var matches = el.textContent.match(b ? /\d+/g : /([٠-٩])/g);
         if (matches != null) {
           var text = el.textContent;
           var res = text;
           for (var i = 0; i < matches.length; i++) {
-            res = res.replace(matches[i], new Intl.NumberFormat('ar-EG').format(matches[i]));
+            res = res.replace(matches[i],
+              b ? new Intl.NumberFormat('ar-EG').format(matches[i]) :
+              matches[i].charCodeAt(0) - 1632);
           }
           el.textContent = res;
         }
       });
     },
 
+    /**
+     * From Western to Eastern Arabic numerals
+     * e.g. from 123 to ١٢٣.
+     */
+    toEA: function() {
+      this._cnvEAWA(true);
+    },
+
+    /**
+     * From Eastern to Western Arabic numerals
+     * e.g. from ١٢٣ to 123.
+     */
     toWA: function() {
-      var allHTMLElements = [].slice.call(document.querySelectorAll('[data-l10n-numerals]'));
-      allHTMLElements.forEach(function(el) {
-        var matches = el.textContent.match(/([٠-٩])/g);
-        if (matches != null) {
-          var text = el.textContent;
-          var res = text;
-          for (var i = 0; i < matches.length; i++) {
-            res = res.replace(matches[i], new Intl.NumberFormat('ar-EG').format(matches[i]));
-          }
-          el.textContent = res;
-        }
-      });
+      this._cnvEAWA(false);
     },
 
     init: function() {
@@ -44,9 +46,12 @@
       window.addEventListener('localized', function(evt) {
         if (evt.detail.language === 'ar') {
           self.toEA();
+        } else {
+          self.toWA();
         }
       });
     }
   }
+
   exports.numerals = numerals;
 }(window));

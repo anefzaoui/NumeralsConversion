@@ -25,5 +25,6 @@
       this.fireLocalizedEvent();
     }
   }
+
   exports.l10n = l10n;
 }(window));
