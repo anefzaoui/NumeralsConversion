@@ -1,15 +1,18 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html>
+
 <head>
-<script src="js/l10n.js"></script>
-<script src="js/numerals.js"></script>
-<script src="js/main.js"></script>
+  <meta charset="utf-8">
+  <script src="js/l10n.js"></script>
+  <script src="js/numerals.js"></script>
+  <script src="js/main.js"></script>
 </head>
+
 <body>
   <button id="arBtn">Set language to Arabic</button>
   <button id="enBtn">Set language to English</button>
-  <p>The number 300 here won't be localized because we haven't set `data-l10n-numerals` to it.</p>
+  <p>The number 300 here won't be localized because we haven't set <code>data-l10n-numerals</code> to it.</p>
   <div data-l10n-numerals id="div1">However 300 here does get translated.</div>
-
 </body>
+
 </html>

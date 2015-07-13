@@ -1,3 +1,5 @@
+"use strict";
+
 (function(exports) {
   var l10n = {
     fireLocalizedEvent: function() {

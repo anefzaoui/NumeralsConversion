@@ -1,3 +1,5 @@
+"use strict";
+
 document.addEventListener('DOMContentLoaded', function _loadingContent() {
   document.removeEventListener('DOMContentLoaded', _loadingContent);
   l10n.setLang('en-US');
