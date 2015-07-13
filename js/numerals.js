@@ -1,45 +1,44 @@
 'use strict';
 
 (function(exports) {
+  function _applyEAWA() {
+    var lang = document.documentElement.lang;
+    if (lang === 'ar') {
+      NumeralsHelper.toEA();
+    } else {
+      NumeralsHelper.toWA();
+    }
+  }
+
   var NumeralsHelper = {
     _cnvMutations: function() {
-      this._applyEAWA();
-    },
-
-    _applyEAWA: function() {
-      var lang = document.documentElement.lang;
-      if (lang === 'ar') {
-        this.toEA();
-      } else {
-        this.toWA();
-      }
+      _applyEAWA();
     },
 
     _cnvEAWA: function(b) {
-      var allHTMLElements = [].slice
-        .call(document.querySelectorAll('[data-intl-numerals]'));
-      allHTMLElements.forEach(function(el) {
-        var matches;
-        if (el.tagName === 'INPUT') {
-          matches = el.value.match(b ? /\d+/g : /([٠-٩])/g);;
-        } else {
-          matches = el.textContent.match(b ? /\d+/g : /([٠-٩])/g);
-        }
-        if (matches != null) {
-          var text = (el.tagName === 'INPUT') ? el.value : el.textContent;
-          var res = text;
-          for (var i = 0; i < matches.length; i++) {
-            res = res.replace(matches[i],
-              b ? new Intl.NumberFormat('ar-EG').format(matches[i]) :
-              matches[i].charCodeAt(0) - 1632);
-          }
+      [].forEach
+        .call(document.querySelectorAll('[data-intl-numerals]'), function(el) {
+          var matches;
           if (el.tagName === 'INPUT') {
-            el.value = res;
+            matches = el.value.match(b ? /\d+/g : /([٠-٩])/g);
           } else {
-            el.textContent = res;
+            matches = el.textContent.match(b ? /\d+/g : /([٠-٩])/g);
           }
-        }
-      });
+          if (matches != null) {
+            var text = (el.tagName === 'INPUT') ? el.value : el.textContent;
+            var res = text;
+            for (var i = 0; i < matches.length; i++) {
+              res = res.replace(matches[i],
+                b ? new Intl.NumberFormat('ar-EG').format(matches[i]) :
+                matches[i].charCodeAt(0) - 1632);
+            }
+            if (el.tagName === 'INPUT') {
+              el.value = res;
+            } else {
+              el.textContent = res;
+            }
+          }
+        });
     },
 
     /**
@@ -65,9 +64,8 @@
        * We call this function when we intend to execute
        * the numerals logic in numerals.js.
        */
-      var self = this;
       window.addEventListener('localized', function(evt) {
-        self._applyEAWA();
+        _applyEAWA();
       });
 
       var observer = new MutationObserver(this._cnvMutations.bind(this));
