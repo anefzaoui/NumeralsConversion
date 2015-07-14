@@ -11,34 +11,53 @@
   }
 
   var NumeralsHelper = {
-    _cnvMutations: function() {
-      _applyEAWA();
+    _cnvMutations: function(mutations) {
+      var self = this;
+      var lang = (document.documentElement.lang === 'ar');
+      mutations.forEach(function(mutation) {
+        self._convertSingleElement(lang ? true : false, mutation.target);
+      });
     },
 
-    _cnvEAWA: function(b) {
-      [].forEach
-        .call(document.querySelectorAll('[data-intl-numerals]'), function(el) {
-          var matches;
-          if (el.tagName === 'INPUT') {
-            matches = el.value.match(b ? /\d+/g : /([٠-٩])/g);
-          } else {
-            matches = el.textContent.match(b ? /\d+/g : /([٠-٩])/g);
-          }
-          if (matches != null) {
-            var text = (el.tagName === 'INPUT') ? el.value : el.textContent;
-            var res = text;
-            for (var i = 0; i < matches.length; i++) {
-              res = res.replace(matches[i],
-                b ? new Intl.NumberFormat('ar-EG').format(matches[i]) :
-                matches[i].charCodeAt(0) - 1632);
-            }
-            if (el.tagName === 'INPUT') {
-              el.value = res;
-            } else {
-              el.textContent = res;
-            }
-          }
-        });
+    /**
+     * Converts a single element and puts input elements
+     * into account because aMutation Obsever won't catch
+     * anything but dynamic content
+     */
+    _convertSingleElement: function(b, el) {
+      var matches;
+      var regs = b ? /\d+/g : /([٠-٩])/g;
+      if (el.tagName === 'INPUT') {
+        matches = el.value.match(regs);
+      } else {
+        matches = el.textContent.match(regs);
+      }
+      if (matches != null) {
+        var text = (el.tagName === 'INPUT') ? el.value : el.textContent;
+        var res = text;
+        for (var i = 0; i < matches.length; i++) {
+          res = res.replace(matches[i],
+            b ? new Intl.NumberFormat('ar-EG').format(matches[i]) :
+            matches[i].charCodeAt(0) - 1632);
+        }
+        if (el.tagName === 'INPUT') {
+          el.value = res;
+        } else {
+          el.textContent = res;
+        }
+      }
+    },
+
+    _cnvEAWA: function(b, elem) {
+      if (elem === undefined) {
+        var self = this;
+        [].forEach.call(document.querySelectorAll('[data-intl-numerals]'),
+          function(el) {
+            self._convertSingleElement(b, el);
+          });
+      } else {
+        this._convertSingleElement(b, elem);
+      }
     },
 
     /**
