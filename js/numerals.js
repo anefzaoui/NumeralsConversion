@@ -12,11 +12,14 @@
 
   var NumeralsHelper = {
     _cnvMutations: function(mutations) {
-      var self = this;
+      /*var self = this;
       var lang = (document.documentElement.lang === 'ar');
       mutations.forEach(function(mutation) {
-        self._convertSingleElement(lang ? true : false, mutation.target);
-      });
+        if (mutation.target.hasAttribute('data-intl-numerals')) {
+          self._convertSingleElement(lang ? true : false, mutation.target);
+        }
+      });*/
+      _applyEAWA();
     },
 
     /**
@@ -32,10 +35,13 @@
       } else {
         matches = el.textContent.match(regs);
       }
-      if (matches != null) {
+      if ((matches !== null) && (matches.length > 0)) {
         var text = (el.tagName === 'INPUT') ? el.value : el.textContent;
         var res = text;
         for (var i = 0; i < matches.length; i++) {
+          if (!b) {
+            res = res.replace('٬', '');
+          }
           res = res.replace(matches[i],
             b ? new Intl.NumberFormat('ar-EG').format(matches[i]) :
             matches[i].charCodeAt(0) - 1632);
@@ -53,6 +59,9 @@
         var self = this;
         [].forEach.call(document.querySelectorAll('[data-intl-numerals]'),
           function(el) {
+            if (el === null) {
+              return;
+            }
             self._convertSingleElement(b, el);
           });
       } else {
